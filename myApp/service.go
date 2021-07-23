@@ -5,17 +5,24 @@ import (
 	"encoding/xml"
 	"net/http"
 
-	"github.com/EricOgie/egobank/domain"
 	"github.com/EricOgie/egobank/konstants"
 )
 
-func serverClients(clientList []*domain.Client, res http.ResponseWriter, req *http.Request) {
+func serveResponse(response interface{}, status int, res http.ResponseWriter, req *http.Request) {
 	if req.Header.Get(konstants.ContentType) == konstants.TypeXML {
 		res.Header().Add(konstants.ContentType, konstants.TypeXML)
-		xml.NewEncoder(res).Encode(clientList)
+		res.WriteHeader(status)
+		if err := xml.NewEncoder(res).Encode(response); err != nil {
+			panic(err)
+		}
+
 	} else {
 		res.Header().Add(konstants.ContentType, konstants.TypeJSON)
-		json.NewEncoder(res).Encode(clientList)
+		res.WriteHeader(status)
+		if err := json.NewEncoder(res).Encode(response); err != nil {
+			panic(err)
+		}
 
 	}
+
 }

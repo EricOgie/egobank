@@ -21,10 +21,9 @@ func greet(res http.ResponseWriter, req *http.Request) {
 func (cHandler ClientHandler) indexClient(res http.ResponseWriter, req *http.Request) {
 	clients, err := cHandler.service.GetAllClient()
 	if err != nil {
-		res.WriteHeader(err.Code)
-		fmt.Fprintf(res, err.Message)
+		serveResponse(err.ErrorMsg(), err.Code, res, req)
 	} else {
-		serverClients(clients, res, req)
+		serveResponse(clients, http.StatusOK, res, req)
 	}
 
 }
@@ -35,11 +34,10 @@ func (cHandler ClientHandler) findOneClient(res http.ResponseWriter, req *http.R
 	id := reqVars["id"]
 	client, err := cHandler.service.GetOneClient(id)
 	if err != nil {
-		res.WriteHeader(err.Code)
-		fmt.Fprintf(res, err.Message)
+		serveResponse(err.ErrorMsg(), err.Code, res, req)
 	} else {
 		clientList = append(clientList, client)
-		serverClients(clientList, res, req)
+		serveResponse(clientList, http.StatusOK, res, req)
 	}
 
 }
