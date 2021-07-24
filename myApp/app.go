@@ -19,7 +19,7 @@ func StartApp() {
 	// handler := ClientHandler{service.CreateNewClientServiceCore(domain.CreateNewClientStub())} for stub test
 	handler := ClientHandler{service.CreateNewClientServiceCore(domain.CreateNewRepoDBMysql())}
 
-	router.HandleFunc("/", greet).Methods("Get")
+	router.HandleFunc("/", greet).Methods(http.MethodGet)
 	router.HandleFunc("/clients", handler.indexClient).Methods(http.MethodGet)
 	router.HandleFunc("/clients/{id:[0-9]+}", handler.findOneClient).Methods(http.MethodGet)
 

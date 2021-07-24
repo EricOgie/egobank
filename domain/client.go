@@ -14,6 +14,6 @@ type Client struct {
 
 // ClientRepo as the customer secondary Port
 type ClientRepo interface {
-	FindAllClient() ([]*Client, *reserrs.MyError)
+	FindAllClient(string) ([]*Client, *reserrs.MyError)
 	ClientByID(string) (*Client, *reserrs.MyError)
 }

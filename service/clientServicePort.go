@@ -7,7 +7,7 @@ import (
 
 // ClientService as a primary port
 type ClientService interface {
-	GetAllClient() ([]*domain.Client, *reserrs.MyError)
+	GetAllClient(string) ([]*domain.Client, *reserrs.MyError)
 	GetOneClient(string) (*domain.Client, *reserrs.MyError)
 }
 
@@ -18,8 +18,8 @@ type ClientServiceCore struct {
 }
 
 // GetAllClient method of ClienService Port Inplementation with ClientServiceCore
-func (core ClientServiceCore) GetAllClient() ([]*domain.Client, *reserrs.MyError) {
-	return core.clientRepo.FindAllClient()
+func (core ClientServiceCore) GetAllClient(status string) ([]*domain.Client, *reserrs.MyError) {
+	return core.clientRepo.FindAllClient(status)
 }
 
 // GetOneClient method of ClienService Port Inplementation with ClientServiceCore

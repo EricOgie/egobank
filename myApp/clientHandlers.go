@@ -19,7 +19,8 @@ func greet(res http.ResponseWriter, req *http.Request) {
 }
 
 func (cHandler ClientHandler) indexClient(res http.ResponseWriter, req *http.Request) {
-	clients, err := cHandler.service.GetAllClient()
+	status := req.URL.Query().Get("status")
+	clients, err := cHandler.service.GetAllClient(status)
 	if err != nil {
 		serveResponse(err.ErrorMsg(), err.Code, res, req)
 	} else {

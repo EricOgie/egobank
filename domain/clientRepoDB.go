@@ -5,7 +5,9 @@ import (
 	"log"
 	"time"
 
+	"github.com/EricOgie/egobank/konstants"
 	"github.com/EricOgie/egobank/reserrs"
+
 	// github.com/go-sql-driver/mysql for mysql driver
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -16,14 +18,20 @@ type RepoDBMysql struct {
 }
 
 // FindAllClient implemtion on RepoDBMysql struct
-func (dBConnection RepoDBMysql) FindAllClient() ([]*Client, *reserrs.MyError) {
+func (dBConnection RepoDBMysql) FindAllClient(status string) ([]*Client, *reserrs.MyError) {
 
-	sqlQuery := "SELECT * FROM customers"
+	var sqlQuery string
+	if status == "" {
+		sqlQuery = "SELECT * FROM customers"
+	} else {
+		sqlQuery = "SELECT * FROM customers WHERE status = " + status
+	}
+
 	rows, err := dBConnection.sqlDB.Query(sqlQuery)
 
 	if err != nil {
 		log.Println("Query Erro! error Msg: " + err.Error())
-		return nil, reserrs.UnexpectedError("Unexpected Server Error")
+		return nil, reserrs.UnexpectedError(konstants.ServerError)
 	}
 
 	var clientList = make([]*Client, 0)

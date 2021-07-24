@@ -8,4 +8,5 @@ const (
 	ContentType = "Content-Type"
 	TypeXML     = "application/xml"
 	TypeJSON    = "application/json"
+	ServerError = "Unexpected Server Error"
 )
