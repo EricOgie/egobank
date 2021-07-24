@@ -2,10 +2,10 @@ package domain
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
 	"github.com/EricOgie/egobank/konstants"
+	"github.com/EricOgie/egobank/mylogger"
 	"github.com/EricOgie/egobank/reserrs"
 
 	// github.com/go-sql-driver/mysql for mysql driver
@@ -30,7 +30,7 @@ func (dBConnection RepoDBMysql) FindAllClient(status string) ([]*Client, *reserr
 	rows, err := dBConnection.sqlDB.Query(sqlQuery)
 
 	if err != nil {
-		log.Println("Query Erro! error Msg: " + err.Error())
+		mylogger.Error("Query Erro! error Msg: " + err.Error())
 		return nil, reserrs.UnexpectedError(konstants.ServerError)
 	}
 
@@ -40,8 +40,8 @@ func (dBConnection RepoDBMysql) FindAllClient(status string) ([]*Client, *reserr
 		var c Client
 		scanErr := rows.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 		if scanErr != nil {
-			log.Println("Scanning Error! Error MSg:  " + scanErr.Error())
-			return nil, reserrs.NotFoundError("Could not Find any resource")
+			mylogger.Error("Scanning Error! Error MSg:  " + scanErr.Error())
+			return nil, reserrs.NotFoundError("Could not Find any resource matching request")
 		}
 
 		clientList = append(clientList, &c)
@@ -57,11 +57,11 @@ func (dBConnection RepoDBMysql) ClientByID(id string) (*Client, *reserrs.MyError
 	err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Println("Scanning Error Noticed! Error Msg: " + err.Error())
+			mylogger.Error("Scanning Error Noticed! Error Msg: " + err.Error())
 			return nil, reserrs.NotFoundError("Client with id, " + id + " does not exit in our Record")
 		}
-		log.Println("Unexpected Server Error! Error Msg: " + err.Error())
-		return nil, reserrs.UnexpectedError("Unexpected Server Error")
+		mylogger.Error("Unexpected Server Error! Error Msg: " + err.Error())
+		return nil, reserrs.UnexpectedError(konstants.ServerError)
 	}
 
 	return &c, nil

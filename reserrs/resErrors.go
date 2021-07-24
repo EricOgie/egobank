@@ -8,7 +8,7 @@ type MyError struct {
 	Message string `json:"message" xml:"message"`
 }
 
-// ErrorMsg helper function to unset code attribute to
+// ErrorMsg helper function to unset code attribute
 func (err MyError) ErrorMsg() *MyError {
 	return &MyError{Message: err.Message}
 }

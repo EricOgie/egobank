@@ -9,4 +9,7 @@ const (
 	TypeXML     = "application/xml"
 	TypeJSON    = "application/json"
 	ServerError = "Unexpected Server Error"
+	AppStart    = "Starting Appliction ...."
+	LogType     = "Logger-Type"
+	Time        = "timestamp"
 )
