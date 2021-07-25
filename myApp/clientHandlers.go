@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/EricOgie/egobank/domain"
+	"github.com/EricOgie/egobank/dto"
 	"github.com/EricOgie/egobank/service"
 	"github.com/gorilla/mux"
 )
@@ -30,7 +30,7 @@ func (cHandler ClientHandler) indexClient(res http.ResponseWriter, req *http.Req
 }
 
 func (cHandler ClientHandler) findOneClient(res http.ResponseWriter, req *http.Request) {
-	var clientList = make([]*domain.Client, 0)
+	var clientList = make([]*dto.ClientResponse, 0)
 	reqVars := mux.Vars(req)
 	id := reqVars["id"]
 	client, err := cHandler.service.GetOneClient(id)

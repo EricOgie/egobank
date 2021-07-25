@@ -16,3 +16,12 @@ const (
 	QueryError    = "Query Error Noticed! Error Msg: "
 	DBCredentials = "root@tcp(localhost)/banking"
 )
+
+// GetClientStatus read Client status
+func GetClientStatus(id string) string {
+	if id == "0" {
+		return "inactive"
+	} else {
+		return "active"
+	}
+}
