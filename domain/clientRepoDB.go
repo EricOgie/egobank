@@ -7,6 +7,7 @@ import (
 	"github.com/EricOgie/egobank/konstants"
 	"github.com/EricOgie/egobank/mylogger"
 	"github.com/EricOgie/egobank/reserrs"
+	"github.com/jmoiron/sqlx"
 
 	// github.com/go-sql-driver/mysql for mysql driver
 	_ "github.com/go-sql-driver/mysql"
@@ -14,53 +15,43 @@ import (
 
 // RepoDBMysql that will implement the ClientRepo interface
 type RepoDBMysql struct {
-	sqlDB *sql.DB
+	sqlDB *sqlx.DB
 }
 
 // FindAllClient implemtion on RepoDBMysql struct
 func (dBConnection RepoDBMysql) FindAllClient(status string) ([]*Client, *reserrs.MyError) {
 
 	var sqlQuery string
+	var err error
+	var clientList = make([]*Client, 0)
 	if status == "" {
 		sqlQuery = "SELECT * FROM customers"
+		err = dBConnection.sqlDB.Select(&clientList, sqlQuery)
 	} else {
-		sqlQuery = "SELECT * FROM customers WHERE status = " + status
+		sqlQuery = "SELECT * FROM customers WHERE status = ?"
+		err = dBConnection.sqlDB.Select(&clientList, sqlQuery, status)
 	}
-
-	rows, err := dBConnection.sqlDB.Query(sqlQuery)
 
 	if err != nil {
 		mylogger.Error("Query Erro! error Msg: " + err.Error())
 		return nil, reserrs.UnexpectedError(konstants.ServerError)
 	}
 
-	var clientList = make([]*Client, 0)
-
-	for rows.Next() {
-		var c Client
-		scanErr := rows.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
-		if scanErr != nil {
-			mylogger.Error("Scanning Error! Error MSg:  " + scanErr.Error())
-			return nil, reserrs.NotFoundError("Could not Find any resource matching request")
-		}
-
-		clientList = append(clientList, &c)
-	}
 	return clientList, nil
 }
 
 // ClientByID interface func implementation
 func (dBConnection RepoDBMysql) ClientByID(id string) (*Client, *reserrs.MyError) {
-	sqlQuery := "SELECT * FROM customers WHERE customer_id = ?"
-	row := dBConnection.sqlDB.QueryRow(sqlQuery, id)
 	var c Client
-	err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
+	var err error
+	sqlQuery := "SELECT * FROM customers WHERE customer_id = ?"
+	err = dBConnection.sqlDB.Get(&c, sqlQuery, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			mylogger.Error("Scanning Error Noticed! Error Msg: " + err.Error())
-			return nil, reserrs.NotFoundError("Client with id, " + id + " does not exit in our Record")
+			mylogger.Error(konstants.QueryError + err.Error())
+			return nil, reserrs.NotFoundError(konstants.NoClient)
 		}
-		mylogger.Error("Unexpected Server Error! Error Msg: " + err.Error())
+		mylogger.Error(konstants.ServerError + "Error Msg: " + err.Error())
 		return nil, reserrs.UnexpectedError(konstants.ServerError)
 	}
 
@@ -70,7 +61,7 @@ func (dBConnection RepoDBMysql) ClientByID(id string) (*Client, *reserrs.MyError
 // CreateNewRepoDBMysql serving both as a helper function for RepoDBMysql and
 // a Databse connection function
 func CreateNewRepoDBMysql() RepoDBMysql {
-	mysqlDatabase, err := sql.Open("mysql", "root@tcp(localhost)/banking")
+	mysqlDatabase, err := sqlx.Open("mysql", konstants.DBCredentials)
 	if err != nil {
 		panic(err.Error())
 	}
