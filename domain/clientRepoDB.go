@@ -2,6 +2,8 @@ package domain
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/EricOgie/egobank/konstants"
@@ -61,7 +63,11 @@ func (dBConnection RepoDBMysql) ClientByID(id string) (*Client, *reserrs.MyError
 // CreateNewRepoDBMysql serving both as a helper function for RepoDBMysql and
 // a Databse connection function
 func CreateNewRepoDBMysql() RepoDBMysql {
-	mysqlDatabase, err := sqlx.Open("mysql", konstants.DBCredentials)
+	// "root@tcp(localhost)/banking"
+	dBCredentials := fmt.Sprintf("%s@tcp(%s)/%s", os.Getenv(konstants.DBUserKey),
+		os.Getenv(konstants.DBAddKey), os.Getenv(konstants.DBNameKey))
+	mysqlDatabase, err := sqlx.Open("mysql", dBCredentials)
+
 	if err != nil {
 		panic(err.Error())
 	}
